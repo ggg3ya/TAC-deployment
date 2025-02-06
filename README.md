@@ -1,164 +1,155 @@
-## TAC build project 
-
-Here’s a step-by-step guide for deploying your smart contract to the TAC Testnet using Foundry. I’ll include every step needed to deploy your contract and broadcast the transaction.
 
 
 ---
 
-Step 1: Install Foundry (if not installed yet)
+# TAC Contract Deployment Tutorial
 
-If you haven’t installed Foundry yet, you can do so with the following commands in your terminal:
-```
-source <(wget -O - https://raw.githubusercontent.com/ggg3ya/installation/main/foundry.sh)
-```
-```
-foundryup
-```
+This tutorial will guide you through deploying a simple smart contract on the **TAC Testnet** using **Foundry** and interacting with it using the **cast** tool.
 
-This installs Foundry and ensures it's up to date.
+## Prerequisites
+
+Before getting started, ensure you have the following installed:
+
+- [Foundry](https://github.com/foundry-rs/foundry)
+- [Cast](https://github.com/gobitfly/cast)
+- A **TAC Testnet account** with some testnet tokens (you can get testnet tokens from the TAC faucet).
+
+---
+
+## Step 1: Install Foundry
+
+To install Foundry, run the following command:
+
+```bash
+curl -L https://foundry.paradigm.xyz | bash
+
+Once installed, you can verify the installation by running:
+
+forge --version
 
 
 ---
 
-Step 2: Create a New Foundry Project
+Step 2: Create a New Project
 
-In your terminal, create a new project by running:
-```
-forge init my-tac-project
+Create a new directory for your project:
+
+mkdir my-tac-project
 cd my-tac-project
-```
 
-This will create a new Foundry project called my-tac-project.
+Initialize a new Foundry project:
+
+forge init
+
+This will create the basic structure for your smart contract.
 
 
 ---
 
 Step 3: Write Your Smart Contract
 
-Create a new contract in the src/ folder. For example, src/MyContract.sol:
-```
+In the src/ directory, create a new file called MyContract.sol and write a simple smart contract:
+
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
 contract MyContract {
     string public message = "Hello, TAC Testnet!";
 
-    function setMessage(string calldata newMessage) public {
-        message = newMessage;
+    function setMessage(string memory _message) public {
+        message = _message;
     }
 }
-```
-
----
-
-Step 4: Compile the Contract
-
-To make sure your contract is correctly compiled, run:
-```
-forge build
-```
-This compiles the smart contract. If it completes without errors, your contract is ready for deployment.
 
 
 ---
 
-Step 5: Set Up the .env File
+Step 4: Configure Your Project
 
-In your project’s root directory, create a .env file to store your sensitive environment variables securely.
+In the project root, configure the .env file to store sensitive data like your RPC URL and private key.
 
-1. Create .env file:
+Create a .env file with the following content:
 
-
-```
-touch .env
-```
-2. Open .env and add the following variables (replace the values with your own):
-
-
-```
-PRIVATE_KEY=your_private_key_here
 TAC_RPC_URL=https://turin.rpc.tac.build
-```
-3. Save and close the .env file.
+PRIVATE_KEY=your_private_key_here
 
-
+Make sure to replace your_private_key_here with your actual private key.
 
 
 ---
 
-Step 6: Load the Environment Variables
+Step 5: Deploy the Contract
 
-Load the .env file to use the environment variables:
-```
-source .env
-```
+Compile and deploy the contract using the following command:
 
----
-
-Step 7: Deploy the Contract
-
-To deploy the contract to the TAC Testnet, use this command:
-```
 forge create --rpc-url $TAC_RPC_URL --private-key $PRIVATE_KEY src/MyContract.sol:MyContract --broadcast
-```
-Explanation:
 
-`--rpc-url $TAC_RPC_URL:` Specifies the RPC URL for TAC Testnet.
+The output will give you the contract address, which will look something like this:
 
-`--private-key $PRIVATE_KEY:` Your wallet’s private key for deployment.
-
-`src/MyContract.sol:MyContract:` Path to your contract and the contract name.
-
-`--broadcast:` This flag will send the transaction to the network (not a dry-run).
-
+Deployed to: 0x8c763a59BB2cc9cd532B94c3CBB15541407dE909
+Transaction hash: 0x007c3078fecf0de4438e81c9d3954b403ace72477018cdc98853a9e25f3149ab
 
 
 ---
 
-Step 8: Verify Deployment
+Step 6: Interact with the Contract
 
-1. Check the contract address: After running the deployment command, you’ll see the contract address in the terminal.
+Once deployed, you can interact with your contract using cast. To get the current message stored in the contract, run:
 
+cast call 0x8c763a59BB2cc9cd532B94c3CBB15541407dE909 "message() (string)" --rpc-url https://turin.rpc.tac.build
 
-2. Check on TAC Testnet Explorer: Use the TAC Testnet Explorer to search for your contract’s address and verify it’s deployed.
+This should return the stored message: "Hello, TAC Testnet!".
 
+To update the message, use the setMessage function:
 
-
-
----
-
-Step 9: Interact with the Contract
-
-Now that your contract is deployed, you can interact with it.
-
-1. To read the message function:
-```
-cast call <contract_address> "message() (string)" --rpc-url $TAC_RPC_URL
-```
-Replace <contract_address> with the actual address you received after deployment.
-
-2. To update the message using setMessage:
-```
-cast send <contract_address> "setMessage(string)" "New Message" --rpc-url $TAC_RPC_URL --private-key $PRIVATE_KEY
-```
-Replace <contract_address> with your deployed contract address and "New Message" with the message you want to set.
+cast send 0x8c763a59BB2cc9cd532B94c3CBB15541407dE909 "setMessage(string)" "New Message" --rpc-url https://turin.rpc.tac.build --private-key $PRIVATE_KEY
 
 
 ---
 
-Troubleshooting Tips
+Step 7: Verify the Contract on the Explorer
 
-If the RPC URL doesn’t work, double-check with the official TAC Testnet RPC URL.
-
-If the private key is wrong or not funded, the transaction will fail. Make sure you’ve got test TAC tokens.
-
-If dry-run happens again, just make sure to use --broadcast to send the actual transaction.
-
+To verify the contract, go to the TAC Testnet Explorer. Enter the contract address (0x8c763a59BB2cc9cd532B94c3CBB15541407dE909) to view the contract's details.
 
 
 ---
 
-That's it! 🚀
+Step 8: Conclusion
 
-Your contract should now be live on the TAC Testnet, and you can interact with it using cast. If anything goes wrong, let me know, and I can help further troubleshoot!
+Congratulations! You've successfully deployed and interacted with a smart contract on the TAC Testnet using Foundry and cast.
 
+For further details on smart contract development with Foundry, visit the Foundry GitHub repository.
+
+If you encounter any issues or have any questions, feel free to open an issue in this repository.
+
+
+---
+
+License
+
+This tutorial is licensed under the MIT License. See LICENSE for details.
+
+---
+
+### **Step 3: Push the Tutorial to GitHub**
+
+1. Add the files to git:
+
+```bash
+git init
+git add .
+git commit -m "Initial commit for TAC deployment tutorial"
+
+2. Push the files to your GitHub repository:
+
+
+
+git remote add origin https://github.com/your-username/tac-contract-deployment-tutorial.git
+git push -u origin master
+
+
+---
+
+Now your GitHub repository is ready with a tutorial to guide others on how to deploy and interact with smart contracts on the TAC Testnet.
+
+Let me know if you need help with any additional steps!
